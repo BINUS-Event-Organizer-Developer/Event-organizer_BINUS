@@ -9,6 +9,10 @@ export const authenticateBlacklistedToken = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader ? authHeader.split(" ")[1] : null;
 
+    if (!user || !token) {
+        return next();
+    }
+
     try {
         const isBlacklisted = await BlacklistedTokenModel.findOne({
             where: { userId: user.id, token },

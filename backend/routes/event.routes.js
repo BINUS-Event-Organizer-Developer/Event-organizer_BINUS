@@ -42,7 +42,7 @@ const router = express.Router();
  *     tags:
  *       - Events
  *     summary: Melihat daftar event
- *     description: Mengambil daftar event. Respon akan berbeda tergantung role pengguna (student akan melihat event terkategori, admin/super_admin akan melihat semua event dengan paginasi).
+ *     description: Mengambil daftar event. Respon akan berbeda tergantung role pengguna (public akan melihat event terkategori, admin/super_admin akan melihat semua event dengan paginasi).
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -79,7 +79,7 @@ const router = express.Router();
  */
 router.get(
     "/",
-    accessTokenValidator(ACCESS_JWT_SECRET),
+    accessTokenValidator(ACCESS_JWT_SECRET, { isOptional: true }),
     authenticateBlacklistedToken,
     eventViewer,
 );
