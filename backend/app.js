@@ -84,10 +84,9 @@ if (!isProduction) {
                         type: "object",
                         properties: {
                             id: { type: "string", format: "uuid" },
-                            studentId: { type: "string", nullable: true },
                             role: {
                                 type: "string",
-                                enum: ["student", "admin", "super_admin"],
+                                enum: ["admin", "super_admin"],
                             },
                             firstName: { type: "string" },
                             lastName: { type: "string" },
