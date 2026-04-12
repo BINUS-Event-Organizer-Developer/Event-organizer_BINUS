@@ -13,7 +13,7 @@ describe("POST /auth/login", () => {
     let testUser;
 
     beforeEach(async () => {
-        testUser = await createTestUser(TEST_USERS.student);
+        testUser = await createTestUser(TEST_USERS.admin);
     });
 
     describe("Successful Login", () => {
@@ -21,8 +21,8 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -46,8 +46,8 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -70,8 +70,8 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -88,8 +88,8 @@ describe("POST /auth/login", () => {
             await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -105,8 +105,8 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -132,8 +132,8 @@ describe("POST /auth/login", () => {
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 )
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -164,7 +164,7 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
+                    email: TEST_USERS.admin.email,
                     password: "WrongPassword123!",
                 })
                 .expect(401);
@@ -178,7 +178,7 @@ describe("POST /auth/login", () => {
             const wrongPasswordResponse = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
+                    email: TEST_USERS.admin.email,
                     password: "WrongPassword123!",
                 });
 
@@ -200,7 +200,7 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    password: TEST_USERS.student.password,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(400);
 
@@ -211,7 +211,7 @@ describe("POST /auth/login", () => {
             const response = await request(app)
                 .post("/auth/login")
                 .send({
-                    email: TEST_USERS.student.email,
+                    email: TEST_USERS.admin.email,
                 })
                 .expect(400);
 
@@ -223,7 +223,7 @@ describe("POST /auth/login", () => {
                 .post("/auth/login")
                 .send({
                     email: "invalid-email",
-                    password: TEST_USERS.student.password,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(400);
 
@@ -250,8 +250,8 @@ describe("POST /auth/login", () => {
                 .post("/auth/login")
                 .set("User-Agent", "Device1")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -260,8 +260,8 @@ describe("POST /auth/login", () => {
                 .post("/auth/login")
                 .set("User-Agent", "Device2")
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 
@@ -281,8 +281,8 @@ describe("POST /auth/login", () => {
                 .post("/auth/login")
                 .set("x-correlation-id", correlationId)
                 .send({
-                    email: TEST_USERS.student.email,
-                    password: TEST_USERS.student.password,
+                    email: TEST_USERS.admin.email,
+                    password: TEST_USERS.admin.password,
                 })
                 .expect(200);
 

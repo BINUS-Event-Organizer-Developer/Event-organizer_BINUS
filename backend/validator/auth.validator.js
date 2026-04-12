@@ -72,25 +72,10 @@ export const otpValidatorSchema = Joi.object({
 });
 
 export const registerValidatorSchema = Joi.object({
-    studentId: Joi.string()
-        .pattern(/^\d+$/)
-        .length(10)
-        .optional()
-        .allow(null, "")
-        .messages({
-            "string.pattern.base": "Student ID hanya boleh berisi angka.",
-            "string.length":
-                "Student ID harus terdiri dari tepat 10 digit angka.",
-        }),
-
-    role: Joi.string()
-        .valid("student", "admin", "super_admin")
-        .required()
-        .messages({
-            "any.only":
-                "Role hanya boleh berisi student, admin, atau super_admin.",
-            "any.required": "Role wajib diisi.",
-        }),
+    role: Joi.string().valid("admin", "super_admin").required().messages({
+        "any.only": "Role hanya boleh berisi admin atau super_admin.",
+        "any.required": "Role wajib diisi.",
+    }),
 
     firstName: Joi.string().trim().min(1).max(100).required().messages({
         "string.min": "First name minimal 1 karakter.",

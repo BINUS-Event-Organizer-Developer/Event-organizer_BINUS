@@ -34,7 +34,7 @@ const router = express.Router();
  *     tags:
  *       - Authentication
  *     summary: Registrasi pengguna baru
- *     description: Mendaftarkan akun baru untuk student, admin, atau super_admin.
+ *     description: Mendaftarkan akun baru untuk admin, atau super_admin.
  *     requestBody:
  *       required: true
  *       content:
@@ -49,13 +49,9 @@ const router = express.Router();
  *               - password
  *               - confirmPassword
  *             properties:
- *               studentId:
- *                 type: string
- *                 description: Wajib untuk role 'student', 10 karakter.
- *                 example: "2502012345"
  *               role:
  *                 type: string
- *                 enum: [student, admin, super_admin]
+ *                 enum: [admin, super_admin]
  *                 example: "admin"
  *               firstName:
  *                 type: string
@@ -156,7 +152,7 @@ router.post(
  *                   format: uuid
  *                 role:
  *                   type: string
- *                   enum: [student, admin, super_admin]
+ *                   enum: [admin, super_admin]
  *                 accessToken:
  *                   type: string
  *                   description: JWT Token untuk otorisasi request selanjutnya.

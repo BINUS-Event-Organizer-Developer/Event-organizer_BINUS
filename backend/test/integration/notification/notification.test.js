@@ -1,12 +1,4 @@
-import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    vi,
-    afterAll,
-    beforeAll,
-} from "vitest";
+import { describe, it, expect, beforeEach, vi, afterAll } from "vitest";
 import request from "supertest";
 import { uuidv7 } from "uuidv7";
 import app from "../../../app.js";
@@ -47,7 +39,6 @@ vi.mock("../../../service/r2service.js", () => ({
 describe("Notification Flow Integration Test", () => {
     let adminUser, adminToken;
     let superAdminUser, superAdminToken;
-    let studentUser;
     let testImageBuffer;
 
     const VALID_1PX_JPG =
@@ -59,6 +50,7 @@ describe("Notification Flow Integration Test", () => {
 
     const NEXT_WEEK = getFutureDate(7);
     const NEXT_MONTH = getFutureDate(30);
+
     beforeEach(async () => {
         adminUser = await createTestUser({
             ...TEST_USERS.admin,
@@ -76,14 +68,6 @@ describe("Notification Flow Integration Test", () => {
             superAdminUser.role,
         );
         superAdminToken = superAuth.accessToken;
-
-        studentUser = await createTestUser({
-            ...TEST_USERS.student,
-            email: `student-${uuidv7()}@binus.ac.id`,
-            studentId: Math.floor(
-                1000000000 + Math.random() * 9000000000,
-            ).toString(),
-        });
     });
 
     afterAll(() => {
@@ -107,7 +91,6 @@ describe("Notification Flow Integration Test", () => {
             expect(res.status).toBe(201);
             const eventId = res.body.data.eventId;
 
-            // 2. VERIFIKASI NOTIFIKASI ADMIN (Self Notification)
             // Admin harus dapat notif bahwa requestnya sedang PENDING
             const adminNotif = await db.Notification.findOne({
                 where: {
@@ -124,7 +107,6 @@ describe("Notification Flow Integration Test", () => {
                 "Tech Summit 2024",
             );
 
-            // 3. VERIFIKASI NOTIFIKASI SUPER ADMIN (Broadcast)
             // Super Admin harus dapat notif ada event baru (event_created)
             const superAdminNotif = await db.Notification.findOne({
                 where: {
@@ -135,18 +117,11 @@ describe("Notification Flow Integration Test", () => {
             });
 
             expect(superAdminNotif).not.toBeNull();
-            expect(superAdminNotif.senderId).toBe(adminUser.id); // Sender harus Admin
+            expect(superAdminNotif.senderId).toBe(adminUser.id);
             expect(superAdminNotif.payload).toHaveProperty(
                 "eventName",
                 "Tech Summit 2024",
             );
-
-            // 4. VERIFIKASI STUDENT (Isolation Check)
-            // Student TIDAK BOLEH dapat notifikasi apapun
-            const studentNotif = await db.Notification.findOne({
-                where: { recipientId: studentUser.id },
-            });
-            expect(studentNotif).toBeNull();
         });
     });
 

@@ -11,15 +11,6 @@ import {
 } from "../../../constant/time.constant.js";
 
 export const TEST_USERS = {
-    student: {
-        studentId: "2502012345",
-        role: "student",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@binus.ac.id",
-        password: "student123",
-        confirmPassword: "student123",
-    },
     admin: {
         role: "admin",
         firstName: "Admin",
@@ -47,7 +38,6 @@ export const createTestUser = async (userData) => {
         firstName: userData.firstName,
         lastName: userData.lastName,
         role: userData.role,
-        studentId: userData.studentId ? userData.studentId : null,
         email: userData.email,
         password: hashedPassword,
         confirmPassword: hashedPassword,
