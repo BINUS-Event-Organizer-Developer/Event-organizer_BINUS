@@ -1,4 +1,5 @@
 import { sequelize } from "../../config/dbconfig.js";
+import "../../model/index.js";
 
 export default async function globalSetup() {
     try {
@@ -6,9 +7,14 @@ export default async function globalSetup() {
         console.log(
             "Global Setup: Connection has been established successfully.",
         );
+
         await sequelize.sync({ force: true, logging: false });
         console.log("Global Setup: Database Schema Created");
-        await sequelize.close();
+
+        return async () => {
+            await sequelize.close();
+            console.log("Global Teardown: Database connection closed.");
+        };
     } catch (error) {
         console.error("Global Setup Error:", error);
         process.exit(1);

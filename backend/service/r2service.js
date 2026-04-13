@@ -1,8 +1,13 @@
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import r2Client from "../config/r2.js";
 
-dotenv.config({ path: "../.env" });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const uploadToR2 = async (fileBuffer, key, mimeType) => {
     const command = new PutObjectCommand({

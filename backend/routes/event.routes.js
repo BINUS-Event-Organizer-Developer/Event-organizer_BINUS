@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { accessTokenValidator } from "../middleware/tokenValidator.middleware.js";
 import {
@@ -23,7 +25,10 @@ import {
 import uploadPoster from "../middleware/uploadPoster.middleware.js";
 import handleMulter from "../middleware/handleMulter.js";
 
-dotenv.config({ path: "../.env" });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const { ACCESS_JWT_SECRET } = process.env;
 const router = express.Router();
@@ -37,7 +42,7 @@ const router = express.Router();
  *     tags:
  *       - Events
  *     summary: Melihat daftar event
- *     description: Mengambil daftar event. Respon akan berbeda tergantung role pengguna (student akan melihat event terkategori, admin/super_admin akan melihat semua event dengan paginasi).
+ *     description: Mengambil daftar event. Respon akan berbeda tergantung role pengguna (public akan melihat event terkategori, admin/super_admin akan melihat semua event dengan paginasi).
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -74,9 +79,9 @@ const router = express.Router();
  */
 router.get(
     "/",
-    accessTokenValidator(ACCESS_JWT_SECRET),
+    accessTokenValidator(ACCESS_JWT_SECRET, { isOptional: true }),
     authenticateBlacklistedToken,
-    eventViewer
+    eventViewer,
 );
 
 /**
@@ -151,7 +156,7 @@ router.post(
     roleValidator("admin"),
     handleMulter(uploadPoster.single("image")),
     schemaValidator({ body: createEventSchema }),
-    createEvent
+    createEvent,
 );
 
 /**
@@ -224,7 +229,7 @@ router.patch(
         params: eventParamsSchema,
         body: updateEventSchema,
     }),
-    editEvent
+    editEvent,
 );
 
 /**
@@ -268,7 +273,7 @@ router.delete(
     authenticateBlacklistedToken,
     roleValidator("admin"),
     schemaValidator({ params: eventParamsSchema }),
-    deleteEvent
+    deleteEvent,
 );
 
 // Event Management Actions
@@ -313,7 +318,7 @@ router.post(
     authenticateBlacklistedToken,
     roleValidator("super_admin"),
     schemaValidator({ params: eventParamsSchema }),
-    approveEvent
+    approveEvent,
 );
 
 /**
@@ -370,7 +375,7 @@ router.post(
     authenticateBlacklistedToken,
     roleValidator("super_admin"),
     schemaValidator({ params: eventParamsSchema, body: feedbackSchema }),
-    rejectEvent
+    rejectEvent,
 );
 
 /**
@@ -423,7 +428,7 @@ router.post(
         params: eventParamsSchema,
         body: feedbackSchema,
     }),
-    createFeedback
+    createFeedback,
 );
 
 export default router;

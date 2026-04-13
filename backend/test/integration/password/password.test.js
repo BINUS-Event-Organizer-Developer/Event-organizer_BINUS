@@ -35,9 +35,9 @@ describe("Password Reset Feature", () => {
     let testUser;
 
     beforeEach(async () => {
-        const uniqueEmail = `student.${Date.now()}@binus.ac.id`;
-        const studentData = { ...TEST_USERS.student, email: uniqueEmail };
-        testUser = await createTestUser(studentData);
+        const uniqueEmail = `admin.${Date.now()}@binus.ac.id`;
+        const userData = { ...TEST_USERS.admin, email: uniqueEmail };
+        testUser = await createTestUser(userData);
     });
 
     afterEach(() => {

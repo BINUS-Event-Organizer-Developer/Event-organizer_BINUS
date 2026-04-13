@@ -19,7 +19,7 @@ describe("POST /auth/logout", () => {
 
     describe("Authorized Scenarios", () => {
         beforeEach(async () => {
-            testUser = await createTestUser(TEST_USERS.student);
+            testUser = await createTestUser(TEST_USERS.admin);
             const tokens = generateTestTokens(testUser.id, testUser.role);
             accessToken = tokens.accessToken;
             refreshToken = tokens.refreshToken;

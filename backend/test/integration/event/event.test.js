@@ -37,8 +37,8 @@ vi.mock("../../../socket/index.js", () => ({
 }));
 
 describe("Event Integration Tests", () => {
-    let studentToken, adminToken, superAdminToken, anotherAdminToken;
-    let studentUser, adminUser, superAdminUser, anotherAdminUser;
+    let adminToken, superAdminToken, anotherAdminToken;
+    let adminUser, superAdminUser, anotherAdminUser;
     let testImageBuffer;
 
     const TOMORROW = getFutureDate(1);
@@ -57,7 +57,6 @@ describe("Event Integration Tests", () => {
     beforeEach(async () => {
         vi.clearAllMocks();
 
-        studentUser = await createTestUser(TEST_USERS.student);
         adminUser = await createTestUser(TEST_USERS.admin);
         superAdminUser = await createTestUser(TEST_USERS.superAdmin);
 
@@ -70,10 +69,6 @@ describe("Event Integration Tests", () => {
             confirmPassword: "password123",
         });
 
-        studentToken = generateTestTokens(
-            studentUser.id,
-            studentUser.role,
-        ).accessToken;
         adminToken = generateTestTokens(
             adminUser.id,
             adminUser.role,
@@ -319,21 +314,7 @@ describe("Event Integration Tests", () => {
         });
 
         describe("Authorization", () => {
-            it("should reject request from student", async () => {
-                await request(app)
-                    .post("/event")
-                    .set("Authorization", `Bearer ${studentToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
-                    .field("startTime", "10:00")
-                    .field("endTime", "12:00")
-                    .field("location", "Test Location")
-                    .field("description", "Test Description")
-                    .attach("image", testImageBuffer, "test.jpg")
-                    .expect(403);
-            });
-
-            it("should reject request from super admin", async () => {
+            it("should reject request from super_admin", async () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${superAdminToken}`)
@@ -378,7 +359,7 @@ describe("Event Integration Tests", () => {
             vi.restoreAllMocks();
         });
 
-        describe("Student Role", () => {
+        describe("Public", () => {
             beforeEach(async () => {
                 const baseDate = new Date("2024-01-01T00:00:00Z");
 
@@ -448,11 +429,8 @@ describe("Event Integration Tests", () => {
                 ]);
             });
 
-            it("should return categorized events for student", async () => {
-                const response = await request(app)
-                    .get("/event")
-                    .set("Authorization", `Bearer ${studentToken}`)
-                    .expect(200);
+            it("should return categorized events for public", async () => {
+                const response = await request(app).get("/event").expect(200);
 
                 expect(response.body.status).toBe("success");
 
@@ -465,11 +443,8 @@ describe("Event Integration Tests", () => {
                 expect(response.body.data.next).toHaveLength(1);
             });
 
-            it("should only return approved events to student", async () => {
-                const response = await request(app)
-                    .get("/event")
-                    .set("Authorization", `Bearer ${studentToken}`)
-                    .expect(200);
+            it("should only return approved events to public", async () => {
+                const response = await request(app).get("/event").expect(200);
 
                 const allEvents = [
                     ...response.body.data.current,
@@ -485,10 +460,7 @@ describe("Event Integration Tests", () => {
             });
 
             it("should not include sensitive fields in response", async () => {
-                const response = await request(app)
-                    .get("/event")
-                    .set("Authorization", `Bearer ${studentToken}`)
-                    .expect(200);
+                const response = await request(app).get("/event").expect(200);
 
                 const allEvents = [
                     ...response.body.data.current,
@@ -641,10 +613,6 @@ describe("Event Integration Tests", () => {
         });
 
         describe("Authentication & Authorization", () => {
-            it("should reject request without token", async () => {
-                await request(app).get("/event").expect(401);
-            });
-
             it("should reject request with invalid token", async () => {
                 await request(app)
                     .get("/event")
@@ -762,12 +730,11 @@ describe("Event Integration Tests", () => {
                     .expect(404);
             });
 
-            it("should reject update from student", async () => {
+            it("should reject update from public", async () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
-                    .set("Authorization", `Bearer ${studentToken}`)
                     .field("eventName", "Hacked Event")
-                    .expect(403);
+                    .expect(401);
             });
 
             it("should reject update from super admin", async () => {
@@ -885,13 +852,6 @@ describe("Event Integration Tests", () => {
                     .delete(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${anotherAdminToken}`)
                     .expect(404);
-            });
-
-            it("should reject deletion from student", async () => {
-                await request(app)
-                    .delete(`/event/${testEvent.id}`)
-                    .set("Authorization", `Bearer ${studentToken}`)
-                    .expect(403);
             });
 
             it("should reject deletion from super admin", async () => {
@@ -1013,14 +973,7 @@ describe("Event Integration Tests", () => {
             it("should reject approval from Admin (Forbidden)", async () => {
                 await request(app)
                     .post(`/event/${pendingEvent.id}/approve`)
-                    .set("Authorization", `Bearer ${adminToken}`) // Admin biasa gaboleh approve
-                    .expect(403);
-            });
-
-            it("should reject approval from Student (Forbidden)", async () => {
-                await request(app)
-                    .post(`/event/${pendingEvent.id}/approve`)
-                    .set("Authorization", `Bearer ${studentToken}`)
+                    .set("Authorization", `Bearer ${adminToken}`)
                     .expect(403);
             });
         });

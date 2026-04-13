@@ -19,11 +19,11 @@ export const register = async (req, res, next) => {
         source: "AuthController.register",
     });
 
-    const { firstName, lastName, studentId, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     try {
         registerLogger.info("Registration process started", {
-            requestBody: { firstName, lastName, studentId, email, role },
+            requestBody: { firstName, lastName, email, role },
         });
 
         const existingUser = await db.User.findOne({
@@ -41,24 +41,6 @@ export const register = async (req, res, next) => {
             });
         }
 
-        if (studentId) {
-            const existingStudentId = await db.User.findOne({
-                where: { studentId },
-            });
-
-            if (existingStudentId) {
-                registerLogger.warn(
-                    "Registration failed: Student ID already exists",
-                    {
-                        studentId,
-                    },
-                );
-                return res.status(409).json({
-                    message: "Student ID sudah terdaftar",
-                });
-            }
-        }
-
         const saltRounds = process.env.NODE_ENV === "test" ? 1 : 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -70,10 +52,6 @@ export const register = async (req, res, next) => {
             password: hashedPassword,
         };
 
-        if (studentId) {
-            userData.studentId = studentId;
-        }
-
         const newUser = await db.User.create(userData);
         const userResponse = {
             id: newUser.id,
@@ -81,7 +59,6 @@ export const register = async (req, res, next) => {
             lastName: newUser.lastName,
             email: newUser.email,
             role: newUser.role,
-            ...(newUser.studentId && { studentId: newUser.studentId }),
             createdAt: newUser.createdAt,
         };
 

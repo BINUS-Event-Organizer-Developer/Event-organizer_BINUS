@@ -22,7 +22,7 @@ describe("POST /auth/refresh", () => {
 
     describe("Successful Token Refresh", () => {
         beforeEach(async () => {
-            testUser = await createTestUser(TEST_USERS.student);
+            testUser = await createTestUser(TEST_USERS.admin);
 
             const tokens = generateTestTokens(testUser.id, testUser.role);
             refreshToken = tokens.refreshToken;
@@ -254,7 +254,7 @@ describe("POST /auth/refresh", () => {
 
         it("should reject refresh with expired refresh token", async () => {
             const expiredToken = jwt.sign(
-                { id: "dummy-id", role: "student" },
+                { id: "dummy-id", role: "admin" },
                 process.env.REFRESH_JWT_SECRET,
                 { expiresIn: "-1h" },
             );
@@ -278,7 +278,7 @@ describe("POST /auth/refresh", () => {
 
         it("should reject refresh token signed with wrong secret", async () => {
             const wrongSecretToken = jwt.sign(
-                { id: "dummy-id", role: "student" },
+                { id: "dummy-id", role: "admin" },
                 "wrong-secret-key",
                 { expiresIn: "7d" },
             );
@@ -293,7 +293,7 @@ describe("POST /auth/refresh", () => {
 
         it("should not accept access token as refresh token", async () => {
             const accessToken = jwt.sign(
-                { id: "dummy-id", role: "student" },
+                { id: "dummy-id", role: "admin" },
                 "wrong-jwt-secret",
                 { expiresIn: "15m" },
             );
@@ -311,7 +311,7 @@ describe("POST /auth/refresh", () => {
         let reuseUser;
 
         beforeEach(async () => {
-            reuseUser = await createTestUser(TEST_USERS.student);
+            reuseUser = await createTestUser(TEST_USERS.admin);
         });
 
         it("should return Not Found when reusing a valid token that has been rotated (not in DB)", async () => {

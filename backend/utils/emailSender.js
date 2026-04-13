@@ -1,7 +1,14 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import AppError from "./AppError.js";
-dotenv.config({ path: "../.env" });
+import globalLogger from "./logger.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -16,10 +23,11 @@ const transporter = nodemailer.createTransport({
 export const checkEmailConnection = async () => {
     try {
         await transporter.verify();
-        console.log("✅ Server email siap menerima pesan");
+        globalLogger.info("✅ Server email siap menerima pesan");
     } catch (error) {
-        console.error("❌ Gagal terhubung ke server email\n", error);
-        throw new AppError("Gagal terhubung ke server email", 500, "EAUTH");
+        const message = "Gagal terhubung ke server email";
+        globalLogger.error(`❌ ${message}\n`, error);
+        throw new AppError(message, 500, "EAUTH");
     }
 };
 

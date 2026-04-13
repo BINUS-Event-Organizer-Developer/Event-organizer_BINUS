@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import getToken from "../utils/getToken.js";
 import AppError from "../utils/AppError.js";
@@ -11,7 +13,10 @@ import {
     SEVEN_DAYS,
 } from "../constant/time.constant.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const saveNewRefreshToken = async (
     userId,

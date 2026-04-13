@@ -12,11 +12,10 @@ describe("POST /auth/register", () => {
             const userData = {
                 firstName: "John",
                 lastName: "Doe",
-                studentId: "1234567890",
                 email: "john.doe@binus.ac.id",
                 password: "SecurePassword123!",
                 confirmPassword: "SecurePassword123!",
-                role: "student",
+                role: "super_admin",
             };
 
             const response = await request(app)
@@ -32,7 +31,6 @@ describe("POST /auth/register", () => {
                     lastName: userData.lastName,
                     email: userData.email,
                     role: userData.role,
-                    studentId: userData.studentId,
                 },
             });
 
@@ -53,31 +51,6 @@ describe("POST /auth/register", () => {
             expect(passwordMatch).toBe(true);
         });
 
-        it("should register a user without studentId (for non-student roles)", async () => {
-            const userData = {
-                firstName: "Jane",
-                lastName: "Smith",
-                email: "jane.smith@binus.ac.id",
-                password: "SecurePassword123!",
-                confirmPassword: "SecurePassword123!",
-                role: "admin",
-            };
-
-            const response = await request(app)
-                .post("/auth/register")
-                .send(userData)
-                .expect(201);
-
-            expect(response.body.data).toMatchObject({
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                email: userData.email,
-                role: userData.role,
-            });
-
-            expect(response.body.data).not.toHaveProperty("studentId");
-        });
-
         it("should include correlation ID in logs when provided in headers", async () => {
             const correlationId = uuidv7();
             const userData = {
@@ -86,8 +59,7 @@ describe("POST /auth/register", () => {
                 email: "test.user@binus.ac.id",
                 password: "Password123!",
                 confirmPassword: "Password123!",
-                role: "student",
-                studentId: "0987654321",
+                role: "admin",
             };
 
             const response = await request(app)
@@ -102,7 +74,7 @@ describe("POST /auth/register", () => {
 
     describe("Duplicate Data Cases", () => {
         it("should return 409 when email already exists", async () => {
-            const existingUser = await createTestUser(TEST_USERS.student);
+            const existingUser = await createTestUser(TEST_USERS.admin);
 
             const newUserData = {
                 firstName: "New",
@@ -110,8 +82,7 @@ describe("POST /auth/register", () => {
                 email: existingUser.email,
                 password: "DifferentPassword123!",
                 confirmPassword: "DifferentPassword123!",
-                role: "student",
-                studentId: "2222222222",
+                role: "admin",
             };
 
             const response = await request(app)
@@ -125,27 +96,6 @@ describe("POST /auth/register", () => {
                 where: { email: existingUser.email },
             });
             expect(userCount).toBe(1);
-        });
-
-        it("should return 409 when studentId already exists", async () => {
-            const existingUser = await createTestUser(TEST_USERS.student);
-
-            const newUserData = {
-                firstName: "Student",
-                lastName: "Two",
-                email: "different@binus.ac.id",
-                password: "Password123!",
-                confirmPassword: "Password123!",
-                role: "student",
-                studentId: existingUser.studentId,
-            };
-
-            const response = await request(app)
-                .post("/auth/register")
-                .send(newUserData)
-                .expect(409);
-
-            expect(response.body.message).toMatch(/Student ID/i);
         });
     });
 
@@ -170,8 +120,7 @@ describe("POST /auth/register", () => {
                 email: "invalid-email-format",
                 password: "Password123!",
                 confirmPassword: "Password123!",
-                role: "student",
-                studentId: "12345678",
+                role: "admin",
             };
 
             const response = await request(app)
@@ -192,7 +141,6 @@ describe("POST /auth/register", () => {
                 password: "Password123!",
                 confirmPassword: "Password123!",
                 role: "super_saiyan",
-                studentId: "12345678",
             };
 
             const response = await request(app)
@@ -205,13 +153,12 @@ describe("POST /auth/register", () => {
     describe("Edge Cases & Security", () => {
         it("should trim whitespace from email", async () => {
             const userData = {
-                studentId: "1234567890",
                 firstName: "Test",
                 lastName: "User",
                 email: "  spaced@binus.ac.id ",
                 password: "Password123!",
                 confirmPassword: "Password123!",
-                role: "student",
+                role: "admin",
             };
 
             const response = await request(app)
@@ -224,13 +171,12 @@ describe("POST /auth/register", () => {
 
         it("should handle SQL injection attempts safely", async () => {
             const maliciousData = {
-                studentId: "1234567890",
                 firstName: "'; DROP TABLE Users; --",
                 lastName: "Test",
                 email: "injection@binus.ac.id",
                 password: "Password123!",
                 confirmPassword: "Password123!",
-                role: "student",
+                role: "admin",
             };
 
             const response = await request(app)
@@ -247,18 +193,17 @@ describe("POST /auth/register", () => {
     describe("Concurrent Registration Attempts", () => {
         it("should handle concurrent registration with same email", async () => {
             const userData = {
-                studentId: "1010101010",
                 firstName: "Concurrent",
                 lastName: "Test",
                 email: "concurrent@binus.ac.id",
                 password: "Password123!",
                 confirmPassword: "Password123!",
-                role: "student",
+                role: "admin",
             };
 
             const userData2 = {
                 ...userData,
-                studentId: "2020202020",
+                lastName: "Testing",
             };
 
             const [response1, response2] = await Promise.all([

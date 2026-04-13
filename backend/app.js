@@ -2,8 +2,9 @@ import express from "express";
 import dns from "node:dns";
 import dotenv from "dotenv";
 import cors from "cors";
-import session from "express-session";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import errorHandler from "./middleware/errorHandler.js";
 import router from "./routes/index.js";
@@ -15,7 +16,10 @@ import "./utils/scheduler.js";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "./.env") });
 
 process.env.FORCE_IPV4 === "true" && dns.setDefaultResultOrder?.("ipv4first");
 
@@ -80,10 +84,9 @@ if (!isProduction) {
                         type: "object",
                         properties: {
                             id: { type: "string", format: "uuid" },
-                            studentId: { type: "string", nullable: true },
                             role: {
                                 type: "string",
-                                enum: ["student", "admin", "super_admin"],
+                                enum: ["admin", "super_admin"],
                             },
                             firstName: { type: "string" },
                             lastName: { type: "string" },
@@ -209,20 +212,6 @@ if (!isProduction) {
 
     logger.info("Swagger UI aktif di /api-docs");
 }
-
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 60000 * 60,
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "strict" : "lax",
-        },
-    }),
-);
 
 app.use(requestLogger);
 app.use(router);

@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { uuidv7 } from "uuidv7";
 
@@ -13,7 +15,10 @@ import { schemaValidator } from "../middleware/schemaValidator.middleware.js";
 import { notificationParamsSchema } from "../validator/notification.validator.js";
 import { ONE_MINUTE } from "../constant/time.constant.js";
 
-dotenv.config({ path: "../.env" });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const { ACCESS_JWT_SECRET } = process.env;
 
 export const notificationLimiter = rateLimit({

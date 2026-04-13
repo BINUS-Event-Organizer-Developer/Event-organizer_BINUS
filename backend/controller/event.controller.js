@@ -17,7 +17,8 @@ import AppError from "../utils/AppError.js";
 
 export const eventViewer = async (req, res, next) => {
     const { correlationId, user } = req;
-    const { id: userId, role } = user;
+    const role = user?.role || "public";
+    const userId = user?.id || null;
 
     const controllerLogger = logger.child({
         correlationId,
@@ -26,7 +27,7 @@ export const eventViewer = async (req, res, next) => {
     });
 
     const eventDataFetchers = {
-        student: getEventsByCategory,
+        public: getEventsByCategory,
         admin: getPaginatedEvents,
         super_admin: getPaginatedEvents,
     };

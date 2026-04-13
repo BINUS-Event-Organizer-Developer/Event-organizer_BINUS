@@ -46,6 +46,11 @@ export const accessTokenValidator = (secretKey, options = {}) => {
 
             req.rawAccessToken = accessToken;
 
+            if (!accessToken && options.isOptional) {
+                req.user = null;
+                return next();
+            }
+
             const decoded = parseAndVerifyToken({
                 token: accessToken,
                 type: "accessToken",

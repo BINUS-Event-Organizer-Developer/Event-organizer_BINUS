@@ -20,9 +20,9 @@ import { sequelize } from "../config/dbconfig.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BCRYPT_SALT_ROUDS = process.env.NODE_ENV === "test" ? 1 : 10;
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-dotenv.config({ path: "../.env" });
+const BCRYPT_SALT_ROUDS = process.env.NODE_ENV === "test" ? 1 : 10;
 
 export const handleUserLogin = async (data, deviceName, loginLogger) => {
     try {
