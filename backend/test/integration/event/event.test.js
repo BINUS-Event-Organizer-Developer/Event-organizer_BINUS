@@ -42,8 +42,11 @@ describe("Event Integration Tests", () => {
     let testImageBuffer;
 
     const TOMORROW = getFutureDate(1);
+    const TOMORROW_END = getFutureDate(2);
     const NEXT_MONTH = getFutureDate(30);
+    const NEXT_MONTH_END = getFutureDate(31);
     const PAST_DATE = getFutureDate(-5);
+    const PAST_DATE_END = getFutureDate(-4);
 
     beforeAll(() => {
         const VALID_1PX_JPG =
@@ -95,8 +98,9 @@ describe("Event Integration Tests", () => {
                 const response = await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Rollback Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Rollback Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -115,8 +119,9 @@ describe("Event Integration Tests", () => {
         describe("Success Cases", () => {
             it("should create event successfully with all required fields", async () => {
                 const eventData = {
-                    eventName: "Test Event",
-                    date: NEXT_MONTH,
+                    name: "Test Event",
+                    startDate: NEXT_MONTH,
+                    endDate: NEXT_MONTH_END,
                     startTime: "10:00",
                     endTime: "12:00",
                     location: "Test Location",
@@ -127,8 +132,9 @@ describe("Event Integration Tests", () => {
                 const response = await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", eventData.eventName)
-                    .field("date", eventData.date)
+                    .field("name", eventData.name)
+                    .field("startDate", eventData.startDate)
+                    .field("endDate", eventData.endDate)
                     .field("startTime", eventData.startTime)
                     .field("endTime", eventData.endTime)
                     .field("location", eventData.location)
@@ -145,7 +151,7 @@ describe("Event Integration Tests", () => {
 
                 const event = await Event.findByPk(response.body.data.eventId);
                 expect(event).toBeDefined();
-                expect(event.eventName).toBe(eventData.eventName);
+                expect(event.name).toBe(eventData.name);
                 expect(event.status).toBe("pending");
             });
 
@@ -153,8 +159,9 @@ describe("Event Integration Tests", () => {
                 const response = await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -169,8 +176,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -189,8 +197,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -210,11 +219,12 @@ describe("Event Integration Tests", () => {
         });
 
         describe("Validation Errors", () => {
-            it("should reject request without eventName", async () => {
+            it("should reject request without name", async () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("date", NEXT_MONTH)
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -223,11 +233,11 @@ describe("Event Integration Tests", () => {
                     .expect(400);
             });
 
-            it("should reject request without date", async () => {
+            it("should reject request without date (startDate and endDate)", async () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
+                    .field("name", "Test Event")
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -240,8 +250,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", "invalid-date")
+                    .field("name", "Test Event")
+                    .field("startDate", "invalid-date")
+                    .field("endDate", "invalid-date")
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -254,8 +265,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", PAST_DATE)
+                    .field("name", "Test Event")
+                    .field("startDate", PAST_DATE)
+                    .field("endDate", PAST_DATE_END)
                     .field("startTime", "25:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -268,8 +280,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -283,8 +296,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -299,8 +313,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Test Invalid Mime")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Invalid Mime")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -318,8 +333,9 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .post("/event")
                     .set("Authorization", `Bearer ${superAdminToken}`)
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -331,8 +347,9 @@ describe("Event Integration Tests", () => {
             it("should reject request without token", async () => {
                 await request(app)
                     .post("/event")
-                    .field("eventName", "Test Event")
-                    .field("date", NEXT_MONTH)
+                    .field("name", "Test Event")
+                    .field("startDate", NEXT_MONTH)
+                    .field("endDate", NEXT_MONTH_END)
                     .field("startTime", "10:00")
                     .field("endTime", "12:00")
                     .field("location", "Test Location")
@@ -370,15 +387,19 @@ describe("Event Integration Tests", () => {
                 };
 
                 const today = createFixedDate(0); // (Today)
+                const todayEnd = createFixedDate(1);
                 const tomorrow = createFixedDate(1); // (This Week)
+                const tomorrowEnd = createFixedDate(2);
                 const nextWeek = createFixedDate(8); // (Next Week)
+                const nextWeekEnd = createFixedDate(9);
 
                 await Event.bulkCreate([
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Event Today",
-                        date: today,
+                        name: "Event Today",
+                        startDate: today,
+                        endDate: todayEnd,
                         startTime: "10:00",
                         endTime: "12:00",
                         location: "Room A",
@@ -390,8 +411,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Event This Week",
-                        date: tomorrow,
+                        name: "Event This Week",
+                        startDate: tomorrow,
+                        endDate: tomorrowEnd,
                         startTime: "14:00",
                         endTime: "16:00",
                         location: "Room B",
@@ -403,8 +425,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Event Next Week",
-                        date: nextWeek,
+                        name: "Event Next Week",
+                        startDate: nextWeek,
+                        endDate: nextWeekEnd,
                         startTime: "09:00",
                         endTime: "11:00",
                         location: "Room C",
@@ -416,8 +439,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Pending Event",
-                        date: today,
+                        name: "Pending Event",
+                        startDate: today,
+                        endDate: todayEnd,
                         startTime: "15:00",
                         endTime: "17:00",
                         location: "Room D",
@@ -478,12 +502,16 @@ describe("Event Integration Tests", () => {
 
         describe("Admin Role", () => {
             beforeEach(async () => {
+                const dateStart = new Date();
+                const dateEnd = new Date(dateStart.getTime() + 86400000); // +1 Day
+
                 await Event.bulkCreate([
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Admin Event 1",
-                        date: new Date(),
+                        name: "Admin Event 1",
+                        startDate: dateStart,
+                        endDate: dateEnd,
                         startTime: "10:00",
                         endTime: "12:00",
                         location: "Room A",
@@ -495,8 +523,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Admin Event 2",
-                        date: new Date(),
+                        name: "Admin Event 2",
+                        startDate: dateStart,
+                        endDate: dateEnd,
                         startTime: "14:00",
                         endTime: "16:00",
                         location: "Room B",
@@ -508,8 +537,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: anotherAdminUser.id,
-                        eventName: "Another Admin Event",
-                        date: new Date(),
+                        name: "Another Admin Event",
+                        startDate: dateStart,
+                        endDate: dateEnd,
                         startTime: "09:00",
                         endTime: "11:00",
                         location: "Room C",
@@ -537,8 +567,9 @@ describe("Event Integration Tests", () => {
                     (_, i) => ({
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "Bulk " + i,
-                        date: new Date(),
+                        name: "Bulk " + i,
+                        startDate: new Date(),
+                        endDate: new Date(),
                         startTime: "10:00",
                         endTime: "12:00",
                         location: "Room",
@@ -576,8 +607,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: adminUser.id,
-                        eventName: "E1",
-                        date: new Date(),
+                        name: "E1",
+                        startDate: new Date(),
+                        endDate: new Date(),
                         status: "pending",
                         startTime: "10",
                         endTime: "12",
@@ -589,8 +621,9 @@ describe("Event Integration Tests", () => {
                     {
                         id: uuidv7(),
                         creatorId: anotherAdminUser.id,
-                        eventName: "E2",
-                        date: new Date(),
+                        name: "E2",
+                        startDate: new Date(),
+                        endDate: new Date(),
                         status: "approved",
                         startTime: "10",
                         endTime: "12",
@@ -629,8 +662,9 @@ describe("Event Integration Tests", () => {
             testEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Original Event",
-                date: new Date(NEXT_MONTH),
+                name: "Original Event",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Original Location",
@@ -645,14 +679,14 @@ describe("Event Integration Tests", () => {
         describe("Success Cases", () => {
             it("should update event successfully", async () => {
                 const updateData = {
-                    eventName: "Updated Event",
+                    name: "Updated Event",
                     location: "Updated Location",
                 };
 
                 const response = await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", updateData.eventName)
+                    .field("name", updateData.name)
                     .field("location", updateData.location)
                     .expect(200);
 
@@ -662,7 +696,7 @@ describe("Event Integration Tests", () => {
                 );
 
                 await testEvent.reload();
-                expect(testEvent.eventName).toBe(updateData.eventName);
+                expect(testEvent.name).toBe(updateData.name);
                 expect(testEvent.location).toBe(updateData.location);
                 expect(testEvent.status).toBe("pending");
             });
@@ -671,7 +705,7 @@ describe("Event Integration Tests", () => {
                 const response = await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Event")
+                    .field("name", "Updated Event")
                     .attach("image", testImageBuffer, "new.jpg")
                     .expect(200);
 
@@ -682,11 +716,11 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Name Only")
+                    .field("name", "Updated Name Only")
                     .expect(200);
 
                 await testEvent.reload();
-                expect(testEvent.eventName).toBe("Updated Name Only");
+                expect(testEvent.name).toBe("Updated Name Only");
                 expect(testEvent.location).toBe("Original Location");
             });
 
@@ -696,7 +730,7 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Event")
+                    .field("name", "Updated Event")
                     .expect(200);
 
                 await testEvent.reload();
@@ -707,7 +741,7 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Event")
+                    .field("name", "Updated Event")
                     .expect(200);
 
                 const notifications = await Notification.findAll({
@@ -726,14 +760,14 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${anotherAdminToken}`)
-                    .field("eventName", "Hacked Event")
+                    .field("name", "Hacked Event")
                     .expect(404);
             });
 
             it("should reject update from public", async () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
-                    .field("eventName", "Hacked Event")
+                    .field("name", "Hacked Event")
                     .expect(401);
             });
 
@@ -741,7 +775,7 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${superAdminToken}`)
-                    .field("eventName", "Updated by Super Admin")
+                    .field("name", "Updated by Super Admin")
                     .expect(403);
             });
         });
@@ -751,7 +785,7 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch("/event/invalid-uuid")
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Event")
+                    .field("name", "Updated Event")
                     .expect(400);
             });
 
@@ -760,7 +794,7 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${fakeId}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("eventName", "Updated Event")
+                    .field("name", "Updated Event")
                     .expect(404);
             });
 
@@ -768,7 +802,8 @@ describe("Event Integration Tests", () => {
                 await request(app)
                     .patch(`/event/${testEvent.id}`)
                     .set("Authorization", `Bearer ${adminToken}`)
-                    .field("date", "invalid-date")
+                    .field("startDate", "invalid-date")
+                    .field("endDate", "invalid-date")
                     .expect(400);
             });
 
@@ -791,8 +826,9 @@ describe("Event Integration Tests", () => {
             testEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event to Delete",
-                date: new Date(NEXT_MONTH),
+                name: "Event to Delete",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
@@ -887,8 +923,9 @@ describe("Event Integration Tests", () => {
             pendingEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Pending Event Approval",
-                date: new Date(NEXT_MONTH),
+                name: "Pending Event Approval",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
@@ -901,8 +938,9 @@ describe("Event Integration Tests", () => {
             revisedEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Revised Event Approval",
-                date: new Date(NEXT_MONTH),
+                name: "Revised Event Approval",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
@@ -915,8 +953,9 @@ describe("Event Integration Tests", () => {
             approvedEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Already Approved Event",
-                date: new Date(NEXT_MONTH),
+                name: "Already Approved Event",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
@@ -1003,8 +1042,9 @@ describe("Event Integration Tests", () => {
             pendingEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event to Reject",
-                date: new Date(NEXT_MONTH),
+                name: "Event to Reject",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
@@ -1071,8 +1111,9 @@ describe("Event Integration Tests", () => {
             pendingEvent = await Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event for Revision",
-                date: new Date(NEXT_MONTH),
+                name: "Event for Revision",
+                startDate: new Date(NEXT_MONTH),
+                endDate: new Date(NEXT_MONTH_END),
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Location",
