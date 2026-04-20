@@ -1,4 +1,4 @@
-import { startOfDay, endOfDay, endOfWeek } from "date-fns";
+import { startOfDay, endOfDay, startOfWeek, endOfWeek } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Op } from "sequelize";
 import AppError from "../../utils/AppError.js";
@@ -12,11 +12,13 @@ export const getEventsByCategory = async ({ logger }) => {
 
     const WIBStartOfDay = startOfDay(nowInWIB);
     const WIBEndOfDay = endOfDay(nowInWIB);
+    const WIBStartOfWeek = startOfWeek(nowInWIB, { weekStartsOn: 1 });
     const WIBEndOfWeek = endOfWeek(nowInWIB, { weekStartsOn: 1 });
 
-    const queryStartToday = fromZonedTime(WIBStartOfDay, timeZone);
-    const queryEndToday = fromZonedTime(WIBEndOfDay, timeZone);
-    const queryEndOfWeek = fromZonedTime(WIBEndOfWeek, timeZone);
+    const todayStart = fromZonedTime(WIBStartOfDay, timeZone);
+    const todayEnd = fromZonedTime(WIBEndOfDay, timeZone);
+    const weekStart = fromZonedTime(WIBStartOfWeek, timeZone);
+    const weekEnd = fromZonedTime(WIBEndOfWeek, timeZone);
 
     try {
         logger.info("Fetching categorized events from database");
@@ -41,37 +43,40 @@ export const getEventsByCategory = async ({ logger }) => {
             ],
         };
 
-        const [currentEvents, thisWeekEvents, nextEvents] = await Promise.all([
-            Event.findAll({
-                ...commonOptions,
-                where: {
-                    ...commonOptions.where,
-                    date: {
-                        [Op.gte]: queryStartToday,
-                        [Op.lte]: queryEndToday,
-                    },
-                },
-            }),
+        const currentEvents = await Event.findAll({
+            ...commonOptions,
+            where: {
+                ...commonOptions.where,
+                [Op.and]: [
+                    { startDate: { [Op.lte]: todayEnd } },
+                    { endDate: { [Op.gte]: todayStart } },
+                ],
+            },
+        });
 
-            Event.findAll({
-                ...commonOptions,
-                where: {
-                    ...commonOptions.where,
-                    date: {
-                        [Op.gt]: queryEndToday,
-                        [Op.lte]: queryEndOfWeek,
-                    },
+        const thisWeekEvents = await Event.findAll({
+            ...commonOptions,
+            where: {
+                ...commonOptions.where,
+                startDate: {
+                    [Op.between]: [weekStart, weekEnd],
                 },
-            }),
+                [Op.not]: {
+                    [Op.and]: [
+                        { startDate: { [Op.lte]: todayEnd } },
+                        { endDate: { [Op.gte]: todayStart } },
+                    ],
+                },
+            },
+        });
 
-            Event.findAll({
-                ...commonOptions,
-                where: {
-                    ...commonOptions.where,
-                    date: { [Op.gt]: queryEndOfWeek },
-                },
-            }),
-        ]);
+        const nextEvents = await Event.findAll({
+            ...commonOptions,
+            where: {
+                ...commonOptions.where,
+                startDate: { [Op.gt]: weekEnd },
+            },
+        });
 
         logger.info("Successfully fetched categorized events", {
             context: {
