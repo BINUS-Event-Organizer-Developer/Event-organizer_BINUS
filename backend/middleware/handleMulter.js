@@ -27,28 +27,28 @@ const handleMulter = (multerMiddleware) => {
             if (err.code === "LIMIT_FILE_SIZE") {
                 logger.warn(
                     "File upload rejected: File too large",
-                    errorLogContext
+                    errorLogContext,
                 );
                 return next(
                     new AppError(
-                        "Ukuran file terlalu besar. Maksimal 10MB.",
+                        "Ukuran file terlalu besar. Maksimal 2MB.",
                         400,
-                        "FILE_TOO_LARGE"
-                    )
+                        "FILE_TOO_LARGE",
+                    ),
                 );
             }
 
             if (err.code === "LIMIT_UNEXPECTED_FILE") {
                 logger.warn(
                     "File upload rejected: Unexpected file field",
-                    errorLogContext
+                    errorLogContext,
                 );
                 return next(
                     new AppError(
                         "Terlalu banyak file atau nama field salah.",
                         400,
-                        "UNEXPECTED_FILE_FIELD"
-                    )
+                        "UNEXPECTED_FILE_FIELD",
+                    ),
                 );
             }
 
@@ -71,8 +71,8 @@ const handleMulter = (multerMiddleware) => {
                 new AppError(
                     err.message || "Gagal mengupload file.",
                     500,
-                    "FILE_UPLOAD_FAILED"
-                )
+                    "FILE_UPLOAD_FAILED",
+                ),
             );
         });
     };
