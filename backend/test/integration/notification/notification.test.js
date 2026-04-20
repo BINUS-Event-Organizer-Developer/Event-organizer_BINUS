@@ -79,8 +79,9 @@ describe("Notification Flow Integration Test", () => {
             const res = await request(app)
                 .post("/event")
                 .set("Authorization", `Bearer ${adminToken}`)
-                .field("eventName", "Tech Summit 2024")
-                .field("date", NEXT_WEEK)
+                .field("name", "Tech Summit 2024")
+                .field("startDate", NEXT_WEEK)
+                .field("endDate", NEXT_MONTH)
                 .field("startTime", "10:00")
                 .field("endTime", "12:00")
                 .field("location", "Auditorium")
@@ -103,7 +104,7 @@ describe("Notification Flow Integration Test", () => {
             expect(adminNotif).not.toBeNull();
             expect(adminNotif.isRead).toBe(false);
             expect(adminNotif.payload).toHaveProperty(
-                "eventName",
+                "name",
                 "Tech Summit 2024",
             );
 
@@ -119,7 +120,7 @@ describe("Notification Flow Integration Test", () => {
             expect(superAdminNotif).not.toBeNull();
             expect(superAdminNotif.senderId).toBe(adminUser.id);
             expect(superAdminNotif.payload).toHaveProperty(
-                "eventName",
+                "name",
                 "Tech Summit 2024",
             );
         });
@@ -132,8 +133,9 @@ describe("Notification Flow Integration Test", () => {
             const event = await db.Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event to Approve",
-                date: NEXT_WEEK,
+                name: "Event to Approve",
+                startDate: NEXT_WEEK,
+                endDate: NEXT_MONTH,
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Loc",
@@ -163,7 +165,7 @@ describe("Notification Flow Integration Test", () => {
             expect(notification).not.toBeNull();
             expect(notification.isRead).toBe(false);
             expect(notification.senderId).toBe(superAdminUser.id);
-            expect(notification.payload.eventName).toBe("Event to Approve");
+            expect(notification.payload.name).toBe("Event to Approve");
         });
     });
 
@@ -174,8 +176,9 @@ describe("Notification Flow Integration Test", () => {
             const event = await db.Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event to Reject",
-                date: NEXT_WEEK,
+                name: "Event to Reject",
+                startDate: NEXT_WEEK,
+                endDate: NEXT_MONTH,
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Loc",
@@ -218,8 +221,9 @@ describe("Notification Flow Integration Test", () => {
             const event = await db.Event.create({
                 id: uuidv7(),
                 creatorId: adminUser.id,
-                eventName: "Event to Revise",
-                date: NEXT_WEEK,
+                name: "Event to Revise",
+                startDate: NEXT_WEEK,
+                endDate: NEXT_MONTH,
                 startTime: "10:00",
                 endTime: "12:00",
                 location: "Test Loc",
