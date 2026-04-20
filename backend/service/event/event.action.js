@@ -22,8 +22,9 @@ export const ROOMS = {
 
 export const createEventService = async (userId, data, file, logger) => {
     const {
-        eventName,
-        date,
+        name,
+        startDate,
+        endDate,
         startTime,
         endTime,
         location,
@@ -35,7 +36,7 @@ export const createEventService = async (userId, data, file, logger) => {
     const { key, folderPath } = generateEventAssetPaths(
         eventId,
         file.originalname,
-        date,
+        startDate,
     );
 
     let uploadResult;
@@ -87,8 +88,9 @@ export const createEventService = async (userId, data, file, logger) => {
                 {
                     id: eventId,
                     creatorId: userId,
-                    eventName,
-                    date,
+                    name,
+                    startDate,
+                    endDate,
                     startTime,
                     endTime,
                     location,
@@ -112,9 +114,11 @@ export const createEventService = async (userId, data, file, logger) => {
                     recipients: superAdmins,
                     notificationType: NOTIFICATION_TYPES.EVENT_CREATED,
                     payload: {
-                        eventName,
+                        name,
                         startTime,
-                        date,
+                        endTime,
+                        startDate,
+                        endDate,
                         location,
                         speaker,
                         imageUrl: event.imageUrl,
@@ -122,7 +126,7 @@ export const createEventService = async (userId, data, file, logger) => {
                     socketConfig: {
                         room: ROOMS.SUPER_ADMIN,
                         title: "A new request has been submitted",
-                        message: `${creatorName} has submitted a request for the event: ${event.eventName}. Please review it.`,
+                        message: `${creatorName} has submitted a request for the event: ${event.name}. Please review it.`,
                     },
                     transaction: t,
                     logger,
@@ -133,9 +137,11 @@ export const createEventService = async (userId, data, file, logger) => {
                     recipientId: userId,
                     notificationType: NOTIFICATION_TYPES.EVENT_PENDING,
                     payload: {
-                        eventName,
+                        name,
                         startTime,
-                        date,
+                        endTime,
+                        startDate,
+                        endDate,
                         location,
                         speaker,
                         imageUrl: event.imageUrl,
@@ -257,17 +263,18 @@ export const deleteEventService = async (adminId, eventId, logger) => {
                 recipients: superAdmins,
                 notificationType: NOTIFICATION_TYPES.EVENT_DELETED,
                 payload: {
-                    eventName: eventDataForCleanupAndNotify.eventName,
+                    name: eventDataForCleanupAndNotify.name,
                     startTime: eventDataForCleanupAndNotify.startTime,
                     endTime: eventDataForCleanupAndNotify.endTime,
-                    date: eventDataForCleanupAndNotify.date,
+                    startDate: eventDataForCleanupAndNotify.startDate,
+                    endDate: eventDataForCleanupAndNotify.endDate,
                     location: eventDataForCleanupAndNotify.location,
                     speaker: eventDataForCleanupAndNotify.speaker,
                     imageUrl: eventDataForCleanupAndNotify.imageUrl,
                 },
                 socketConfig: {
                     room: ROOMS.SUPER_ADMIN,
-                    title: `Event "${eventDataForCleanupAndNotify.eventName}" has been deleted.`,
+                    title: `Event "${eventDataForCleanupAndNotify.name}" has been deleted.`,
                     message: `${adminName} removed this event from the system.`,
                 },
                 transaction: t,
@@ -359,7 +366,7 @@ export const updateEventService = async (
         }
 
         if (image) {
-            const effectiveDate = data.date || existingEvent.date;
+            const effectiveDate = data.startDate || existingEvent.startDate;
 
             const { key, folderPath } = generateEventAssetPaths(
                 eventId,
@@ -396,8 +403,9 @@ export const updateEventService = async (
             });
 
             const allowedUpdates = {
-                eventName: data.eventName,
-                date: data.date,
+                name: data.name,
+                startDate: data.startDate,
+                endDate: data.endDate,
                 startTime: data.startTime,
                 endTime: data.endTime,
                 location: data.location,
@@ -439,18 +447,19 @@ export const updateEventService = async (
                     recipients: superAdmins,
                     notificationType: NOTIFICATION_TYPES.EVENT_UPDATED,
                     payload: {
-                        eventName: updatedPayloadData.eventName,
+                        name: updatedPayloadData.name,
                         startTime: updatedPayloadData.startTime,
                         endTime: updatedPayloadData.endTime,
-                        date: updatedPayloadData.date,
+                        startDate: updatedPayloadData.startDate,
+                        endDate: updatedPayloadData.endDate,
                         location: updatedPayloadData.location,
                         speaker: updatedPayloadData.speaker,
                         imageUrl: updatedPayloadData.imageUrl,
                     },
                     socketConfig: {
                         room: ROOMS.SUPER_ADMIN,
-                        eventName: "eventUpdated",
-                        message: `Event "${updatedPayloadData.eventName}" telah diperbarui dan menunggu persetujuan.`,
+                        name: "eventUpdated",
+                        message: `Event "${updatedPayloadData.name}" telah diperbarui dan menunggu persetujuan.`,
                     },
                     transaction: t,
                     logger,
@@ -461,10 +470,11 @@ export const updateEventService = async (
                     recipientId: adminId,
                     notificationType: NOTIFICATION_TYPES.EVENT_PENDING,
                     payload: {
-                        eventName: updatedPayloadData.eventName,
+                        name: updatedPayloadData.name,
                         startTime: updatedPayloadData.startTime,
                         endTime: updatedPayloadData.endTime,
-                        date: updatedPayloadData.date,
+                        startDate: updatedPayloadData.startDate,
+                        endDate: updatedPayloadData.endDate,
                         location: updatedPayloadData.location,
                         speaker: updatedPayloadData.speaker,
                         imageUrl: updatedPayloadData.imageUrl,

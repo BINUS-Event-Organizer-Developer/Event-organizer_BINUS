@@ -31,7 +31,7 @@ const processEventStatusChange = async ({
 
             if (!event) {
                 logger.warn(
-                    `${actionName} failed: Event not found in database`
+                    `${actionName} failed: Event not found in database`,
                 );
                 throw new AppError(notFoundMessage, 404, "NOT_FOUND");
             }
@@ -42,7 +42,7 @@ const processEventStatusChange = async ({
             ) {
                 const message = `Event tidak dapat diproses karena statusnya sudah ${event.status}`;
                 logger.warn(
-                    `${actionName} failed: Invalid status. Current: ${event.status}, Required: ${requiredCurrentStatuses}`
+                    `${actionName} failed: Invalid status. Current: ${event.status}, Required: ${requiredCurrentStatuses}`,
                 );
                 throw new AppError(message, 409, "CONFLICT_STATE");
             }
@@ -66,10 +66,11 @@ const processEventStatusChange = async ({
                 notificationType,
                 feedback,
                 payload: {
-                    eventName: event.eventName,
+                    name: event.name,
                     startTime: event.startTime,
                     endTime: event.endTime,
-                    date: event.date,
+                    startDate: event.startDate,
+                    endDate: event.endDate,
                     location: event.location,
                     speaker: event.speaker,
                     imageUrl: event.imageUrl,
@@ -105,7 +106,7 @@ export const rejectEventService = async (
     eventId,
     superAdminId,
     feedback,
-    logger
+    logger,
 ) => {
     return processEventStatusChange({
         eventId,
@@ -142,7 +143,7 @@ export const approveEventService = async (eventId, superAdminId, logger) => {
         requiredCurrentStatuses: ["pending", "revised"],
         getSocketConfig: (event) => ({
             title: "Your Request has been APPROVED",
-            message: `Congratulations! Your event "${event.eventName}" has been approved.`,
+            message: `Congratulations! Your event "${event.name}" has been approved.`,
         }),
     });
 };
@@ -151,7 +152,7 @@ export const submitEventFeedbackService = async (
     eventId,
     superAdminId,
     feedback,
-    logger
+    logger,
 ) => {
     return processEventStatusChange({
         eventId,

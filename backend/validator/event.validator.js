@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const baseEventSchema = Joi.object({
-    eventName: Joi.string().trim().min(3).max(150).messages({
+    name: Joi.string().trim().min(3).max(150).messages({
         "string.base": "Nama event harus berupa teks.",
         "string.empty": "Nama event tidak boleh kosong.",
         "string.min": "Nama event minimal 3 karakter.",
@@ -68,7 +68,7 @@ const baseEventSchema = Joi.object({
             "time.durationTooLong": "Durasi event maksimal 12 jam.",
         }),
 
-    date: Joi.string()
+    startDate: Joi.string()
         .pattern(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/)
         .custom((value, helpers) => {
             const data = helpers.state.ancestors[0] || {};
@@ -107,7 +107,64 @@ const baseEventSchema = Joi.object({
             "string.base": "Tanggal event harus berupa teks.",
             "string.empty": "Tanggal event tidak boleh kosong.",
             "string.pattern.base": "Format tanggal harus ISO (YYYY-MM-DD).",
+            "startDate.invalid": "Tanggal tidak valid.",
+            "datetime.past":
+                "Tanggal dan waktu event tidak boleh di masa lalu.",
+            "startDate.tooFarFuture":
+                "Tanggal event tidak boleh lebih dari 1 tahun ke depan.",
+        }),
+
+    endDate: Joi.string()
+        .pattern(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/)
+        .custom((value, helpers) => {
+            const data = helpers.state.ancestors[0] || {};
+            const { startTime, endTime, startDate: startDateValue } = data;
+
+            const eventDate = new Date(value);
+            if (isNaN(eventDate.getTime())) {
+                return helpers.error("date.invalid");
+            }
+
+            if (startDateValue) {
+                const startDateObj = new Date(startDateValue);
+                if (!isNaN(startDateObj.getTime())) {
+                    if (eventDate < startDateObj) {
+                        return helpers.error("date.endBeforeStart");
+                    }
+                }
+            }
+
+            if (startTime && /^\d{2}:\d{2}$/.test(startTime)) {
+                const [hours, minutes] = startTime.split(":").map(Number);
+                const eventStartDateTime = new Date(eventDate);
+                eventStartDateTime.setHours(hours, minutes, 0, 0);
+
+                const now = new Date();
+                const fiveMinutesFromNow = new Date(
+                    now.getTime() + FIVE_MINUTES,
+                );
+
+                if (eventStartDateTime <= fiveMinutesFromNow) {
+                    return helpers.error("datetime.past");
+                }
+            }
+
+            const oneYearFromNow = new Date();
+            oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+            if (eventDate > oneYearFromNow) {
+                return helpers.error("date.tooFarFuture");
+            }
+
+            return value;
+        })
+        .messages({
+            "string.base": "Tanggal event harus berupa teks.",
+            "string.empty": "Tanggal event tidak boleh kosong.",
+            "string.pattern.base": "Format tanggal harus ISO (YYYY-MM-DD).",
             "date.invalid": "Tanggal tidak valid.",
+            "date.endBeforeStart":
+                "Tanggal selesai tidak boleh lebih kecil dari tanggal mulai.",
             "datetime.past":
                 "Tanggal dan waktu event tidak boleh di masa lalu.",
             "date.tooFarFuture":
@@ -205,7 +262,7 @@ const baseEventSchema = Joi.object({
     });
 
 export const createEventSchema = baseEventSchema.keys({
-    eventName: baseEventSchema.extract("eventName").required().messages({
+    name: baseEventSchema.extract("name").required().messages({
         "any.required": "Nama event wajib diisi.",
     }),
     description: baseEventSchema.extract("description").required().messages({
@@ -217,8 +274,11 @@ export const createEventSchema = baseEventSchema.keys({
     endTime: baseEventSchema.extract("endTime").required().messages({
         "any.required": "Waktu selesai event wajib diisi.",
     }),
-    date: baseEventSchema.extract("date").required().messages({
-        "any.required": "Tanggal event wajib diisi..",
+    startDate: baseEventSchema.extract("startDate").required().messages({
+        "any.required": "Tanggal mulai event wajib diisi..",
+    }),
+    endDate: baseEventSchema.extract("endDate").required().messages({
+        "any.required": "Tanggal selesai event wajib diisi..",
     }),
     location: baseEventSchema.extract("location").required().messages({
         "any.required": "Lokasi event wajib diisi.",

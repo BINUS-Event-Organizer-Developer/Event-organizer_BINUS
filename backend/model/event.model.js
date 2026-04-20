@@ -19,11 +19,15 @@ const eventModel = (sequelize, DataTypes) => {
                     key: "id",
                 },
             },
-            eventName: {
+            name: {
                 type: DataTypes.STRING(70),
                 allowNull: false,
             },
-            date: {
+            startDate: {
+                type: DataTypes.DATEONLY,
+                allowNull: false,
+            },
+            endDate: {
                 type: DataTypes.DATEONLY,
                 allowNull: false,
             },
@@ -82,7 +86,7 @@ const eventModel = (sequelize, DataTypes) => {
                     fields: ["status"],
                 },
                 {
-                    fields: ["date"],
+                    fields: ["startDate", "endDate"],
                 },
             ],
         },

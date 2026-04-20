@@ -24,14 +24,15 @@ export const getEventsByCategory = async ({ logger }) => {
         const commonOptions = {
             where: { status: "approved" },
             order: [
-                ["date", "ASC"],
+                ["startDate", "ASC"],
                 ["startTime", "ASC"],
             ],
             attributes: [
                 "id",
-                "eventName",
+                "name",
                 "description",
-                "date",
+                "startDate",
+                "endDate",
                 "startTime",
                 "endTime",
                 "location",
