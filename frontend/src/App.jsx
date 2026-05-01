@@ -39,7 +39,7 @@ function App() {
         <Route path="/superadmin" element={<Navigate to="/login/superadmin" />} />
 
         <Route path="/login" element={<LoginUserPage />} />
-        <Route path="/" element={<LoginUserPage />} />
+        <Route path="/" element={<DashboardUser />} />
         <Route path="/login/admin" element={<LoginAdminPage />} />
         <Route path="/login/superadmin" element={<LoginSuperAdminPage />} />
 
@@ -49,11 +49,7 @@ function App() {
 
         <Route
           path="/dashboard"
-          element={
-            <ProtectedRoute allowedRoles={['student']} loginUrl="/login">
-              <DashboardUser />
-            </ProtectedRoute>
-          }
+          element={<DashboardUser />}
         />
         <Route
           path="/admin/dashboard"
