@@ -95,13 +95,36 @@ const RegisterAdminPage = () => {
         navigate('/login/admin');
       }, 2500);
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
-      if (err.details) {
+      // err adalah apiData langsung (dari interceptor)
+      const apiData = err || {};
+      setError(apiData.message || 'Registration failed. Please try again.');
+      
+      console.log('Error response from backend:', apiData);
+      
+      if (apiData.errorField && typeof apiData.errorField === 'object') {
+        console.log('Setting field errors from errorField:', apiData.errorField);
+        setFieldErrors(apiData.errorField);
+      } else if (Array.isArray(apiData.errors)) {
+        // Handle Sequelize validation errors (array)
+        const sequelizeErrors = {};
+        apiData.errors.forEach(errObj => {
+          if (errObj.field && errObj.message) {
+            sequelizeErrors[errObj.field] = errObj.message;
+          } else if (errObj.path && errObj.message) {
+            // Handle Zod validation errors
+            sequelizeErrors[errObj.path[0] || errObj.path] = errObj.message;
+          }
+        });
+        console.log('Setting field errors from errors array:', sequelizeErrors);
+        setFieldErrors(sequelizeErrors);
+      } else if (apiData.details && Array.isArray(apiData.details)) {
+        // Handle another error format
         const backendErrors = {};
-        err.details.forEach(detail => {
+        apiData.details.forEach(detail => {
           const field = detail.path?.[0];
           if (field) backendErrors[field] = detail.message;
         });
+        console.log('Setting field errors from details:', backendErrors);
         setFieldErrors(backendErrors);
       }
     } finally {

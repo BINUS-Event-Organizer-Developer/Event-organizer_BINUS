@@ -57,10 +57,16 @@ const RegisterSuperAdminPage = () => {
       }, 2500);
 
     } catch (err) {
-      const apiData = err.response?.data || {};
+      // err adalah apiData langsung (dari interceptor)
+      const apiData = err || {};
       const errorMessage = apiData.message || 'Registration failed. Please try again.';
       setError(errorMessage);
+      
+      console.log('Error response from backend:', apiData);
+      
+      // Handle different error response formats from backend
       if (apiData.errorField && typeof apiData.errorField === 'object') {
+        console.log('Setting field errors from errorField:', apiData.errorField);
         setFieldErrors(apiData.errorField);
       } else if (Array.isArray(apiData.errors)) {
         // Handle Sequelize validation errors (array)
@@ -68,9 +74,22 @@ const RegisterSuperAdminPage = () => {
         apiData.errors.forEach(errObj => {
           if (errObj.field && errObj.message) {
             sequelizeErrors[errObj.field] = errObj.message;
+          } else if (errObj.path && errObj.message) {
+            // Handle Zod validation errors
+            sequelizeErrors[errObj.path[0] || errObj.path] = errObj.message;
           }
         });
+        console.log('Setting field errors from errors array:', sequelizeErrors);
         setFieldErrors(sequelizeErrors);
+      } else if (apiData.details && Array.isArray(apiData.details)) {
+        // Handle another error format
+        const backendErrors = {};
+        apiData.details.forEach(detail => {
+          const field = detail.path?.[0];
+          if (field) backendErrors[field] = detail.message;
+        });
+        console.log('Setting field errors from details:', backendErrors);
+        setFieldErrors(backendErrors);
       } else {
         setFieldErrors({});
       }
@@ -85,7 +104,7 @@ const RegisterSuperAdminPage = () => {
     overlay: "absolute w-full h-full inset-y-0 inset-x-0 bg-[#B0D6F580]",
     formContainer: "bg-[#3F88BC] z-10 sm:w-fit md:w-96 lg:w-[600px] p-10 md:p-8 rounded-md text-white lg:absolute right-10 bottom-5",
     logoContainer: "text-center space-y-2 mb-4 ",
-    logoText: "text-xs font-semibold ml-2",
+    logoText: "text-sm font-semibold ml-2",
     form: "space-y-4",
     inputGroup: "flex items-center bg-white rounded-md overflow-hidden",
     icon: "p-3 text-[#3F88BC]",
@@ -114,41 +133,41 @@ const RegisterSuperAdminPage = () => {
           <div className={className.inputGroup}>
             <div className={className.icon}><FaUser /></div>
             <div className={className.separator}></div>
-            <input name="firstName" type="text" placeholder="First Name" className={className.input} value={formData.firstName} onChange={handleChange} required />
+            <input name="firstName" type="text" placeholder="First Name" className={`${className.input} ${fieldErrors.firstName ? 'border-red-300' : ''}`} value={formData.firstName} onChange={handleChange} required />
           </div>
-          {fieldErrors.firstName && <p className="text-red-300 text-xs mt-1">{fieldErrors.firstName}</p>}
+          {fieldErrors.firstName && <p className="text-red-300 text-sm mt-1">{fieldErrors.firstName}</p>}
 
           {/* Last Name */}
           <div className={className.inputGroup}>
             <div className={className.icon}><FaUser /></div>
             <div className={className.separator}></div>
-            <input name="lastName" type="text" placeholder="Last Name" className={className.input} value={formData.lastName} onChange={handleChange} required />
+            <input name="lastName" type="text" placeholder="Last Name" className={`${className.input} ${fieldErrors.lastName ? 'border-red-300' : ''}`} value={formData.lastName} onChange={handleChange} required />
           </div>
-          {fieldErrors.lastName && <p className="text-red-300 text-xs mt-1">{fieldErrors.lastName}</p>}
+          {fieldErrors.lastName && <p className="text-red-300 text-sm mt-1">{fieldErrors.lastName}</p>}
 
           {/* Email */}
           <div className={className.inputGroup}>
             <div className={className.icon}><FaEnvelope /></div>
             <div className={className.separator}></div>
-            <input name="email" type="email" placeholder="Email (@binus.ac.id or @gmail.com)" className={className.input} value={formData.email} onChange={handleChange} required />
+            <input name="email" type="email" placeholder="Email (@binus.ac.id or @gmail.com)" className={`${className.input} ${fieldErrors.email ? 'border-red-300' : ''}`} value={formData.email} onChange={handleChange} required />
           </div>
-          {fieldErrors.email && <p className="text-red-300 text-xs mt-1">{fieldErrors.email}</p>}
+          {fieldErrors.email && <p className="text-red-300 text-sm mt-1">{fieldErrors.email}</p>}
 
           {/* Password */}
           <div className={className.inputGroup}>
             <div className={className.icon}><FaLock /></div>
             <div className={className.separator}></div>
-            <input name="password" type="password" placeholder="Password (min. 8 characters)" className={className.input} value={formData.password} onChange={handleChange} required />
+            <input name="password" type="password" placeholder="Password (min. 8 characters)" className={`${className.input} ${fieldErrors.password ? 'border-red-300' : ''}`} value={formData.password} onChange={handleChange} required />
           </div>
-          {fieldErrors.password && <p className="text-red-300 text-xs mt-1">{fieldErrors.password}</p>}
+          {fieldErrors.password && <p className="text-red-300 text-sm mt-1">{fieldErrors.password}</p>}
 
           {/* Confirm Password */}
           <div className={className.inputGroup}>
             <div className={className.icon}><FaLock /></div>
             <div className={className.separator}></div>
-            <input name="confirmPassword" type="password" placeholder="Confirm Password" className={className.input} value={formData.confirmPassword} onChange={handleChange} required />
+            <input name="confirmPassword" type="password" placeholder="Confirm Password" className={`${className.input} ${fieldErrors.confirmPassword ? 'border-red-300' : ''}`} value={formData.confirmPassword} onChange={handleChange} required />
           </div>
-          {fieldErrors.confirmPassword && <p className="text-red-300 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
+          {fieldErrors.confirmPassword && <p className="text-red-300 text-sm mt-1">{fieldErrors.confirmPassword}</p>}
 
           {/* Role (disembunyikan, karena user publik diasumsikan sebagai 'student') */}
           <input name="role" type="hidden" value="student" />
