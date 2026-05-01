@@ -47,7 +47,7 @@ const withTimeout = (promise, ms, name) => {
 
 const startServer = async () => {
     try {
-        await withTimeout(checkEmailConnection(), 10000, "Email Connection");
+        // await withTimeout(checkEmailConnection(), 10000, "Email Connection");
         await withTimeout(testDBConnection(), 10000, "Database Connection");
 
         const server = http.createServer(app);

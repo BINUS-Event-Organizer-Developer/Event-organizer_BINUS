@@ -97,7 +97,7 @@ const LoginAdminPage = () => {
       <footer className={className.footer}>
         <div className={className.grid}>
           <Link className={className.link} to={"/"}>
-            <FaBook /> <p>Sign in as Student</p>
+            <FaBook /> <p>Event Viewer</p>
           </Link>
           <Link className={className.link} to={"/login/superadmin"}>
             <FaSuperpowers /> <p>Sign in as Super Admin</p>

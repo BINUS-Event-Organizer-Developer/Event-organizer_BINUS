@@ -5,10 +5,10 @@ import avatar from '../../assets/profilePhoto.jpg';
 
 const MainHeader = ({ pageTitle }) => {
   const { user, logout } = useAuth();
-  
+
   // Fallback to localStorage if context user is null
   const currentUser = user || JSON.parse(localStorage.getItem('user') || 'null');
-  
+
 
 
   // Jika user tidak ada, tampilkan header default sebagai Public
@@ -31,7 +31,7 @@ const MainHeader = ({ pageTitle }) => {
           </div>
           <img src={avatar} alt="Public" className="w-10 h-10 rounded-full object-cover" />
 
-          <button onClick={() => window.location.href = '/login'} className="self-center ml-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
+          <button onClick={() => window.location.href = '/admin'} className="self-center ml-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
             Log In
           </button>
         </div>
