@@ -1,14 +1,12 @@
 // src/App.jsx
 import './index.css';
-import { Route, Routes, Link, redirect, Navigate } from 'react-router-dom';
+import { Route, Routes, Link, redirect, Navigate } from 'react-router';
 
-import LoginUserPage from './Pages/Login';
 import LoginAdminPage from './Pages/Admin/Login';
 import LoginSuperAdminPage from './Pages/SuperAdmin/Login';
 import DashboardUser from './Pages/Dashboard';
 import AdminDashboard from './Pages/Admin/Dashboard';
 import ProtectedRoute from './Pages/Auth/ProtectedRoute';
-import RegisterUserPage from './Pages/Register';
 import RegisterAdminPage from './Pages/Admin/Register';
 import RegisterSuperAdminPage from './Pages/SuperAdmin/Register';
 import SuperAdminDashboard from './Pages/SuperAdmin/Dashboard';
@@ -30,13 +28,11 @@ function App() {
   return (
     <div className="w-screen min-h-screen overflow-x-hidden bg-gray-100">
       <Routes>
-        <Route path='/register' element={<RegisterUserPage />} />
         <Route path='/register/admin' element={<RegisterAdminPage />} />
         <Route path='/register/superadmin' element={<RegisterSuperAdminPage />} />
         <Route path="/" element={<DashboardUser />} />
         <Route path="/admin" element={<Navigate to="/login/admin" />} />
         <Route path="/superadmin" element={<Navigate to="/login/superadmin" />} />
-        <Route path="/login" element={<LoginUserPage />} />
         <Route path="/login/admin" element={<LoginAdminPage />} />
         <Route path="/login/superadmin" element={<LoginSuperAdminPage />} />
 

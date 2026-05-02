@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaLock } from 'react-icons/fa';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router';
 import authService from '../../services/authService';
 import { validatePassword } from '../../services/validation';
 

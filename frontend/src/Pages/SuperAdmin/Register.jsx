@@ -1,7 +1,7 @@
 // src/Pages/RegisterUserPage.jsx
 import React, { useState } from 'react';
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import authService from '../../services/authService';
 
 import logo from '../../assets/logo.png';

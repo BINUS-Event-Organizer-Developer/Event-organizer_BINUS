@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEnvelope } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import authService from '../../services/authService';
 import { validateEmail } from '../../services/validation';
 

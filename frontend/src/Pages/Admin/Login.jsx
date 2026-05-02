@@ -1,7 +1,7 @@
 // src/Pages/Admin/Login.jsx
 import React, { useState } from 'react';
 import { FaBook, FaEnvelope, FaLock, FaSuperpowers } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 // Pastikan path asset Anda benar
 import logo from '../../assets/logo.png';
