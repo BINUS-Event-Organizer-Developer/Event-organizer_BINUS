@@ -21,6 +21,8 @@ db.Notification = notificationModel(sequelize, DataTypes);
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+// db.sequelize.sync({ force: true });
+
 Object.values(db).forEach((model) => {
     if (model.associate) {
         model.associate(db);
