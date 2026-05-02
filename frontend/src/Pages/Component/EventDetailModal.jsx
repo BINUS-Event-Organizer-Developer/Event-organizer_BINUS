@@ -50,7 +50,7 @@ const EventDetailModal = ({ isOpen, onClose, event, onApprove, onReject, onRevis
             <div className="mb-6 relative group cursor-pointer" onClick={() => setExtendImage(!extendImage)}>
               <img
                 src={event.imageUrl}
-                alt={event.eventName}
+                alt={event.name || event.eventName}
                 className={`w-full h-48 object-cover rounded-lg shadow-md transition-all duration-300 ${extendImage ? 'h-auto' : 'max-h-48'}`}
               />
               {/* Overlay */}
@@ -65,7 +65,7 @@ const EventDetailModal = ({ isOpen, onClose, event, onApprove, onReject, onRevis
           {/* Event Title & Status */}
           <div className="mb-6">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-bold text-gray-800">{event.eventName}</h3>
+              <h3 className="text-xl font-bold text-gray-800">{event.name || event.eventName}</h3>
               <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event.status)}`}>
                 {event.status?.toUpperCase()}
               </span>
@@ -78,7 +78,11 @@ const EventDetailModal = ({ isOpen, onClose, event, onApprove, onReject, onRevis
               <FaCalendarAlt className="text-blue-500" />
               <div>
                 <p className="text-sm text-gray-600">Date</p>
-                <p className="font-semibold">{formatDate(event.date)}</p>
+                <p className="font-semibold">
+                  {event.startDate && event.endDate && event.startDate !== event.endDate 
+                    ? `${formatDate(event.startDate)} - ${formatDate(event.endDate)}` 
+                    : formatDate(event.startDate || event.date)}
+                </p>
               </div>
             </div>
 
@@ -142,19 +146,19 @@ const EventDetailModal = ({ isOpen, onClose, event, onApprove, onReject, onRevis
         {event.status === 'pending' || event.status === 'revised' ? (
           <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
             <button
-              onClick={() => onRevise(event.id, event.eventName)}
+              onClick={() => onRevise(event.id, event.name || event.eventName)}
               className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               Request Revision
             </button>
             <button
-              onClick={() => onReject(event.id, event.eventName)}
+              onClick={() => onReject(event.id, event.name || event.eventName)}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
               Reject
             </button>
             <button
-              onClick={() => onApprove(event.id, event.eventName)}
+              onClick={() => onApprove(event.id, event.name || event.eventName)}
               className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               Approve

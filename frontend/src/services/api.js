@@ -10,7 +10,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const userString = localStorage.getItem('user');
+    const userString = sessionStorage.getItem('user');
     if (userString) {
       try {
         const userData = JSON.parse(userString);
@@ -20,8 +20,8 @@ apiClient.interceptors.request.use(
           console.log('Token attached to request:', token.substring(0, 20) + '...');
         }
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
-        localStorage.removeItem('user'); // Hapus data yang corrupt
+        console.error('Error parsing user data from sessionStorage:', error);
+        sessionStorage.removeItem('user'); // Hapus data yang corrupt
       }
     }
     if (config.data instanceof FormData) {

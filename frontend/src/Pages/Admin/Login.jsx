@@ -1,7 +1,7 @@
 // src/Pages/Admin/Login.jsx
 import React, { useState } from 'react';
 import { FaBook, FaEnvelope, FaLock, FaSuperpowers } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 // Pastikan path asset Anda benar
 import logo from '../../assets/logo.png';
@@ -97,7 +97,7 @@ const LoginAdminPage = () => {
       <footer className={className.footer}>
         <div className={className.grid}>
           <Link className={className.link} to={"/"}>
-            <FaBook /> <p>Sign in as Student</p>
+            <FaBook /> <p>Event Viewer</p>
           </Link>
           <Link className={className.link} to={"/login/superadmin"}>
             <FaSuperpowers /> <p>Sign in as Super Admin</p>

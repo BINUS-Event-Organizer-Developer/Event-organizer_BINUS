@@ -7,3 +7,5 @@ playground/
 risk.txt
 logs/
 coverage/
+
+controller/user.controller.js

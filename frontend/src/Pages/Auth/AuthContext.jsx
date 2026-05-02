@@ -1,7 +1,7 @@
 // src/Pages/Auth/AuthContext.jsx
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import authService from '../../services/authService'; // 1. Impor authService
 
 export const AuthContext = createContext(null);

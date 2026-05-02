@@ -6,7 +6,8 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
   const [formData, setFormData] = useState({
     eventName: '',
     location: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     startTime: '',
     endTime: '',
     speaker: '',
@@ -24,9 +25,10 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
     if (isOpen && isEditMode) {
       // const [datePart, timePart] = (eventToEdit.date || ' - ').split(' - ');
       setFormData({
-        eventName: eventToEdit.eventName || '',
+        eventName: eventToEdit.name || eventToEdit.eventName || '',
         location: eventToEdit.location || '',
-        date: eventToEdit.date || '',
+        startDate: eventToEdit.startDate ? String(eventToEdit.startDate).substring(0, 10) : (eventToEdit.date ? String(eventToEdit.date).substring(0, 10) : ''),
+        endDate: eventToEdit.endDate ? String(eventToEdit.endDate).substring(0, 10) : (eventToEdit.date ? String(eventToEdit.date).substring(0, 10) : ''),
         startTime: eventToEdit.startTime || '',
         endTime: eventToEdit.endTime || '',
         speaker: eventToEdit.speaker || '',
@@ -36,7 +38,7 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
       setPreviewImageSrc(eventToEdit.imageUrl ? `${eventToEdit.imageUrl}?t=${new Date().getTime()}` : null);
     } else {
       // Reset semua state saat modal ditutup atau dalam mode 'New Event'
-      setFormData({ eventName: '', location: '', date: '', startTime: '', endTime: '', speaker: '', description: '', image: null });
+      setFormData({ eventName: '', location: '', startDate: '', endDate: '', startTime: '', endTime: '', speaker: '', description: '', image: null });
       // Clean up previous object URL before setting to null
       if (previewImageSrc && previewImageSrc.startsWith('blob:')) {
         URL.revokeObjectURL(previewImageSrc);
@@ -109,8 +111,9 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
             fieldErrors = [...fieldErrors, ...timeRangeErrors];
           }
           break;
-        case 'date':
-          fieldErrors = validateDate(value, formData.startTime);
+        case 'startDate':
+        case 'endDate':
+          // fieldErrors = validateDate(value, formData.startTime);
           break;
         case 'location':
           fieldErrors = validateLocation(value);
@@ -131,7 +134,8 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
       eventName: validateEventName(formData.eventName),
       startTime: validateTime(formData.startTime, 'Waktu mulai event'),
       endTime: validateTime(formData.endTime, 'Waktu selesai event'),
-      date: validateDate(formData.date, formData.startTime),
+      startDate: !formData.startDate ? ['Start date is required'] : [],
+      endDate: !formData.endDate ? ['End date is required'] : [],
       location: validateLocation(formData.location),
       speaker: validateSpeaker(formData.speaker),
       image: validateImage(formData.image, !isEditMode)
@@ -152,8 +156,9 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
     if (hasErrors) return;
 
     const fd = new FormData();
-    fd.append('eventName', formData.eventName.trim());
-    fd.append('date', formData.date);
+    fd.append('name', formData.eventName.trim());
+    fd.append('startDate', formData.startDate);
+    fd.append('endDate', formData.endDate);
     fd.append('startTime', formData.startTime);
     fd.append('endTime', formData.endTime);
     fd.append('location', formData.location.trim());
@@ -225,10 +230,17 @@ const EventFormModal = ({ isOpen, onClose, onSave, eventToEdit, helperMessage })
 
             </div>
 
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-600">Date *</label>
-              <input type="date" name="date" id="date" value={formData.date} onChange={handleChange} className={`mt-1 w-full rounded-lg border px-4 py-2 focus:ring-blue-500 ${errors.date?.length ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`} />
-              {errors.date?.map((error, idx) => <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-600">Start Date *</label>
+                <input type="date" name="startDate" id="startDate" value={formData.startDate} onChange={handleChange} className={`mt-1 w-full rounded-lg border px-4 py-2 focus:ring-blue-500 ${errors.startDate?.length ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`} />
+                {errors.startDate?.map((error, idx) => <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>)}
+              </div>
+              <div>
+                <label htmlFor="endDate" className="block text-sm font-medium text-gray-600">End Date *</label>
+                <input type="date" name="endDate" id="endDate" value={formData.endDate} onChange={handleChange} className={`mt-1 w-full rounded-lg border px-4 py-2 focus:ring-blue-500 ${errors.endDate?.length ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`} />
+                {errors.endDate?.map((error, idx) => <p key={idx} className="text-red-500 text-xs mt-1">{error}</p>)}
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

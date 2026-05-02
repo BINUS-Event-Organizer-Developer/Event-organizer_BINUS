@@ -350,7 +350,7 @@ const SuperAdminDashboard = () => {
                 const rowNumber = (currentPage - 1) * (paginationInfo?.pageSize || 10) + index + 1;
 
                 // Date Formatting Helper
-                const dateObj = new Date(event.date);
+                const dateObj = new Date(event.startDate || event.date);
                 const day = dateObj.getDate();
                 const month = dateObj.toLocaleString('en-US', { month: 'long' });
                 const year = dateObj.getFullYear();
@@ -402,7 +402,7 @@ const SuperAdminDashboard = () => {
                   >
                     <td className="p-3">
                       <span className="font-bold text-gray-500 mr-2">{rowNumber}.</span>
-                      <span className="font-bold text-gray-800">{event.eventName}</span>
+                      <span className="font-bold text-gray-800">{event.name || event.eventName}</span>
                     </td>
                     <td className="p-3 font-medium text-gray-700">{formattedDate}</td>
                     <td className="p-3 font-medium text-gray-700">{event.location}</td>

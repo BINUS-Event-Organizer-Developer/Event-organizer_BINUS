@@ -14,6 +14,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import RealtimeClock from "./Component/realtime";
 import MainHeader from "./Component/MainHeader";
 import { getEventsByCategory } from "../services/event";
+import { Navigate } from "react-router";
 
 const DashboardUser = () => {
   const [currentEvents, setCurrentEvents] = useState([]);
@@ -67,7 +68,7 @@ const DashboardUser = () => {
     const searchTermLower = searchItem.toLowerCase();
     const results = thisWeekEvents.filter((event) => {
       // Logika pencarian Anda sudah benar
-      return `${event.eventName} ${event.location} ${event.speaker}`
+      return `${event.name || event.eventName} ${event.location} ${event.speaker}`
         .toLowerCase()
         .includes(searchTermLower);
     });
@@ -76,11 +77,11 @@ const DashboardUser = () => {
 
   // Mapping data untuk EventCarousel
   const carouselData = currentEvents.map(event => ({
-    title: event.eventName,
+    title: event.name || event.eventName,
     description: event.description,
     location: event.location,
     speaker: event.speaker,
-    date: new Date(event.date).toLocaleDateString(),
+    date: new Date(event.startDate || event.date).toLocaleDateString(),
     time: `${event.startTime} - ${event.endTime}`,
     image: event.imageUrl || '/api/placeholder/400/300'
   }));
@@ -117,13 +118,13 @@ const DashboardUser = () => {
               filteredThisWeek.map((event, index) => (
                 <li key={event.id} className={`p-4 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} flex items-center justify-between`}>
                   <div className="flex-1">
-                    <p className="font-semibold text-lg">{event.eventName}</p>
+                    <p className="font-semibold text-lg">{event.name || event.eventName}</p>
                     {event.description && (
                       <p className="text-sm text-gray-700 mt-1 line-clamp-2">{event.description}</p>
                     )}
                     <div className="flex items-center text-sm text-gray-600 space-x-3 mt-2">
                       <span className="flex items-center">
-                        <FaRegCalendarAlt className="mr-1" /> {new Date(event.date).toLocaleDateString()}
+                        <FaRegCalendarAlt className="mr-1" /> {new Date(event.startDate || event.date).toLocaleDateString()}
                       </span>
                       <span className="flex items-center">
                         <FaRegClock className="mr-1" /> {`${event.startTime} - ${event.endTime}`}
@@ -141,51 +142,73 @@ const DashboardUser = () => {
             )}
           </ul>
 
-          <h1 className="text-2xl font-semibold mt-10 mb-5">Next Events</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 w-full">
-            {nextEvents.slice(0, 4).map((event) => {
-              // Date Formatting Helper
-              const dateObj = new Date(event.date);
-              const day = dateObj.getDate();
-              const month = dateObj.toLocaleString('en-US', { month: 'long' });
-              const year = dateObj.getFullYear();
-              const suffix = (d) => {
-                if (d > 3 && d < 21) return 'th';
-                switch (d % 10) {
-                  case 1: return "st";
-                  case 2: return "nd";
-                  case 3: return "rd";
-                  default: return "th";
-                }
-              };
-              const formattedDate = `${day}${suffix(day)} ${month} ${year}`;
+          <div className="flex flex-col xl:flex-row gap-8 w-full mt-10">
+            <div className="flex-1">
+              <h1 className="text-2xl font-semibold mb-5">Next Events</h1>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
+                {nextEvents.slice(0, 4).map((event) => {
+                  // Date Formatting Helper
+                  const dateObj = new Date(event.startDate || event.date);
+                  const day = dateObj.getDate();
+                  const month = dateObj.toLocaleString('en-US', { month: 'long' });
+                  const year = dateObj.getFullYear();
+                  const suffix = (d) => {
+                    if (d > 3 && d < 21) return 'th';
+                    switch (d % 10) {
+                      case 1: return "st";
+                      case 2: return "nd";
+                      case 3: return "rd";
+                      default: return "th";
+                    }
+                  };
+                  const formattedDate = `${day}${suffix(day)} ${month} ${year}`;
 
-              return (
-                <div
-                  key={event.id + "-next"}
-                  className="px-5 py-4 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
-                >
-                  <h1 className="text-base font-bold text-gray-900 leading-snug line-clamp-2">{event.eventName}</h1>
+                  return (
+                    <div
+                      key={event.id + "-next"}
+                      className="px-5 py-4 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
+                    >
+                      <h1 className="text-base font-bold text-gray-900 leading-snug line-clamp-2">{event.name || event.eventName}</h1>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <FaClock className="text-[#F97316] w-4 h-4 shrink-0" /> {/* Orange */}
-                      <span>{event.startTime} - {event.endTime}</span>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                          <FaClock className="text-[#F97316] w-4 h-4 shrink-0" /> {/* Orange */}
+                          <span>{event.startTime} - {event.endTime}</span>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                          <FaRegCalendarAlt className="text-[#3B82F6] w-4 h-4 shrink-0" /> {/* Blue */}
+                          <span>{formattedDate}</span>
+                        </div>
+
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                          <FaLocationPin className="text-[#EF4444] w-4 h-4 shrink-0" /> {/* Red */}
+                          <span className="line-clamp-1">{event.location}</span>
+                        </div>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            </div>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <FaRegCalendarAlt className="text-[#3B82F6] w-4 h-4 shrink-0" /> {/* Blue */}
-                      <span>{formattedDate}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
-                      <FaLocationPin className="text-[#EF4444] w-4 h-4 shrink-0" /> {/* Red */}
-                      <span className="line-clamp-1">{event.location}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {/* QR Code Section */}
+            <div className="w-full xl:w-72 flex-shrink-0 flex flex-col items-center justify-center p-6 border border-gray-200 rounded-xl bg-gradient-to-b from-blue-50 to-white shadow-sm mt-12 xl:mt-0">
+              <h3 className="font-bold text-gray-800 text-lg mb-2 text-center">Ajukan Event!</h3>
+              <p className="text-sm text-gray-600 text-center mb-4">
+                Punya ide acara keren? Scan QR ini untuk mengisi form pengajuan ke PIC Event.
+              </p>
+              <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <img
+                  src="../../src/assets/QRForm.png"
+                  alt="QR Code Pengajuan Event"
+                  className="w-32 h-32 object-contain"
+                />
+              </div>
+              <a href="https://forms.gle/Nzn4jgG55NsX14tEA" target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-semibold text-blue-600 hover:text-blue-800 underline">
+                Atau klik di sini
+              </a>
+            </div>
           </div>
         </div>
       </div>
