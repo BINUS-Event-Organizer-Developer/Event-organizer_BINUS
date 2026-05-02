@@ -19,8 +19,8 @@ const login = async (email, password) => {
         ...response.data.user,
         accessToken: response.data.accessToken
       };
-      localStorage.setItem('user', JSON.stringify(userData));
-      console.log('User data saved to localStorage:', userData);
+      sessionStorage.setItem('user', JSON.stringify(userData));
+      console.log('User data saved to sessionStorage:', userData);
     }
 
     return {
@@ -49,7 +49,7 @@ const logout = async () => {
   } catch (error) {
     console.error("Logout API call failed, but proceeding with client-side logout.", error);
   } finally {
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
     window.location.href = '/';
   }
 };
@@ -119,9 +119,9 @@ const resetPassword = async (email, password, resetToken) => {
 
 // --- Helper Functions (Tidak ada perubahan) ---
 const getCurrentUser = () => {
-  const userString = localStorage.getItem('user');
+  const userString = sessionStorage.getItem('user');
   if (!userString) {
-    console.log('No user data in localStorage');
+    console.log('No user data in sessionStorage');
     return null;
   }
   
@@ -131,7 +131,7 @@ const getCurrentUser = () => {
     return userData;
   } catch (error) {
     console.error('Error parsing user data:', error);
-    localStorage.removeItem('user'); // Hapus data yang corrupt
+    sessionStorage.removeItem('user'); // Hapus data yang corrupt
     return null;
   }
 };

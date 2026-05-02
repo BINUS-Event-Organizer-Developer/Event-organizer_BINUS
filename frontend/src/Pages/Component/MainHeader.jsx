@@ -6,8 +6,8 @@ import avatar from '../../assets/profilePhoto.jpg';
 const MainHeader = ({ pageTitle }) => {
   const { user, logout } = useAuth();
 
-  // Fallback to localStorage if context user is null
-  const currentUser = user || JSON.parse(localStorage.getItem('user') || 'null');
+  // Fallback to sessionStorage if context user is null
+  const currentUser = user || JSON.parse(sessionStorage.getItem('user') || 'null');
 
 
 
