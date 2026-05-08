@@ -13,7 +13,7 @@ module.exports = {
     async down(queryInterface, Sequelize) {
         const tableDesc = await queryInterface.describeTable("events");
         if (tableDesc.startDate) {
-            await queryInterface.renameColum("events", "startDate", "endDate");
+            await queryInterface.renameColum("events", "startDate", "date");
         }
     },
 };
