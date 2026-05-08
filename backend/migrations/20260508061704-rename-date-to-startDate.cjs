@@ -6,14 +6,14 @@ module.exports = {
         const tableDesc = await queryInterface.describeTable("events");
 
         if (tableDesc.date) {
-            await queryInterface.renameColum("events", "date", "startDate");
+            await queryInterface.renameColumn("events", "date", "startDate");
         }
     },
 
     async down(queryInterface, Sequelize) {
         const tableDesc = await queryInterface.describeTable("events");
         if (tableDesc.startDate) {
-            await queryInterface.renameColum("events", "startDate", "date");
+            await queryInterface.renameColumn("events", "startDate", "date");
         }
     },
 };
